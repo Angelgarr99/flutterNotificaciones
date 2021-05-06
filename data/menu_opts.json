@@ -1,0 +1,8 @@
+{
+    "nombreApp": "Componentes",
+    "rutas": [{
+        "ruta": "notificacion",
+        "icon": "add_alert",
+        "texto": "Crear Notificación"
+    }]
+}
