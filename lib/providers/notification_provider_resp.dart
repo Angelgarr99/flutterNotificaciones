@@ -1,7 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
@@ -27,41 +25,22 @@ class NotificationService {
   Future<void> init() async {
     final AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('app_icon');
-    final IOSInitializationSettings initializationSettingsIOS =
-        IOSInitializationSettings(
-      requestSoundPermission: false,
-      requestBadgePermission: false,
-      requestAlertPermission: false,
-      onDidReceiveLocalNotification: onDidReceiveLocalNotification,
-    );
-    final bool result = await flutterLocalNotificationsPlugin
-        .resolvePlatformSpecificImplementation<
-            IOSFlutterLocalNotificationsPlugin>()
-        ?.requestPermissions(
-          alert: true,
-          badge: true,
-          sound: true,
-        );
 
     final InitializationSettings initializationSettings =
         InitializationSettings(
-            android: initializationSettingsAndroid,
-            iOS: initializationSettingsIOS,
-            macOS: null);
-    await flutterLocalNotificationsPlugin.initialize(
-      initializationSettings,
-      // onSelectNotification: selectNotification
-    );
+            android: initializationSettingsAndroid, iOS: null, macOS: null);
+    await flutterLocalNotificationsPlugin.initialize(initializationSettings,
+        onSelectNotification: selectNotification);
     tz.initializeTimeZones();
   }
 
-  // Future selectNotification(String payload) async {
-  //   NotificacionModel notificacionModel =
-  //       getNotificacionModelFromPayload(payload);
-  //   cancelNotificationDateTime(notificacionModel);
-  //   scheduleNotificationForDatetime(notificacionModel,
-  //       "proximo recordatorio '${notificacionModel.texto}'!");
-  // }
+  Future selectNotification(String payload) async {
+    NotificacionModel notificacionModel =
+        getNotificacionModelFromPayload(payload);
+    cancelNotificationDateTime(notificacionModel);
+    scheduleNotificationForDatetime(notificacionModel,
+        "proximo recordatorio '${notificacionModel.texto}'!");
+  }
 
   void showNotification(
       NotificacionModel notificacionModel, String notificationMessage) async {
@@ -71,12 +50,7 @@ class NotificationService {
         notificationMessage,
         const NotificationDetails(
             android: AndroidNotificationDetails(channel_id, applicationName,
-                'Para recordarte los próximos cumpleaños.',
-                enableVibration: true,
-                importance: Importance.max,
-                playSound: true),
-            iOS: IOSNotificationDetails(
-                presentAlert: true, presentBadge: true, presentSound: true)),
+                'Para recordarte los próximos cumpleaños.')),
         payload: jsonEncode(notificacionModel));
   }
 
@@ -94,6 +68,7 @@ class NotificationService {
                   difference.inMinutes <= 1)
                 {showNotification(notificacionModel, notificationMessage)}
             });
+
     await flutterLocalNotificationsPlugin.zonedSchedule(
         notificacionModel.hashCode,
         applicationName,
@@ -140,32 +115,5 @@ class NotificationService {
         await flutterLocalNotificationsPlugin.getNotificationAppLaunchDetails();
 
     return notificationAppLaunchDetails.didNotificationLaunchApp;
-  }
-
-  Future onDidReceiveLocalNotification(
-      int id, String title, String body, String payload) async {
-    // display a dialog with the notification details, tap ok to go to another page
-    showDialog(
-      context: null,
-      builder: (BuildContext context) => CupertinoAlertDialog(
-        title: Text(title),
-        content: Text(body),
-        actions: [
-          CupertinoDialogAction(
-            isDefaultAction: true,
-            child: Text('Ok'),
-            onPressed: () async {
-              Navigator.of(context, rootNavigator: true).pop();
-              await Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) {
-                  Navigator.pushNamed(context, '/');
-                }),
-              );
-            },
-          )
-        ],
-      ),
-    );
   }
 }

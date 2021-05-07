@@ -239,7 +239,7 @@ class _CrearNotifiPageState extends State<CrearNotifiPage> {
               TextButton(
                   style: TextButton.styleFrom(primary: Colors.blue),
                   onPressed: () {
-                    Navigator.of(context, rootNavigator: true);
+                    Navigator.of(context, rootNavigator: true).pop();
                   },
                   child: Text('Ok'))
             ],

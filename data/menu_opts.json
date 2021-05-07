@@ -1,8 +1,14 @@
 {
     "nombreApp": "Componentes",
     "rutas": [{
-        "ruta": "notificacion",
-        "icon": "add_alert",
-        "texto": "Crear Notificación"
-    }]
+            "ruta": "notificacion",
+            "icon": "add_alert",
+            "texto": "Crear Notificación"
+        },
+        {
+            "ruta": "adm_Notificaciones",
+            "icon": "construction_outlined",
+            "texto": "Administrar Notificaciones"
+        }
+    ]
 }
